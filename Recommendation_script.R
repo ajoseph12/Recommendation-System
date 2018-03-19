@@ -52,12 +52,12 @@ library(e1071)
 #################################
 setwd("~/Desktop/MLDM master/Semester 2/Data Mining/DM_project/") #- setting to working directory
 
-crowd_fund <- read.csv("~/Desktop/MLDM master/Semester 2/Data Mining/DM_project/recos_training.csv",
+crowd_fund <- read.csv("~/Desktop/MLDM master/Semester 2/Data Mining/DM_project/Recommendation-System/recos_training.csv",
                   sep = ",", 
                   header = TRUE, 
                   na.strings = c("NA","#DIV/0!",""))
 crowd_fund$id<- NULL
-train <- original
+train <- crowd_fund
 ## checking for NA values
 any(is.na(train))
 
@@ -153,9 +153,10 @@ project isn't in this category. 1 would mean that the user is completely into pr
 genre"
 
 # mainly zeros plot 
-zero_values <- as.data.frame(colSums(original[,-25] == 0))
+zero_values <- as.data.frame(colSums(crowd_fund[,-25] == 0))
 ggplot(zero_values,aes(x=reorder(rownames(zero_values),zero_values[,]),y=zero_values[,])) + 
-  geom_bar(stat="identity",fill="red")+coord_flip()+theme_bw() + ylab("Count") + xlab("Features")
+  geom_bar(stat="identity",fill="red")+theme_bw() + ylab("Count") + xlab("Features") + 
+  theme(axis.text.x=element_text(angle = -90, hjust = 0))
 ## Prelimnary analysis 
 
 #checking the effect of PCA on the genre columns 
@@ -242,6 +243,22 @@ confusionMatrix(PredictedValue, my_test$V24)
 
 
 
+##### 
+panel.cor <- function(x, y){
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- round(cor(x, y), digits=4)
+  txt <- paste0("R = ", r)
+  text(0.5, 0.5, txt)
+}
+# Customize upper panel
+upper.panel<-function(x, y){
+  points(x,y, pch = 19, col = my_cols[train$contrib])
+}
+# Create the plots
+pairs(crowd_fund[,1:8], 
+      lower.panel = panel.cor,
+      upper.panel = upper.panel)
 
 
 

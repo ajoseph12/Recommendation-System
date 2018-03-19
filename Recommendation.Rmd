@@ -4,16 +4,15 @@ author: "Allwyn Joseph - MLDM"
 date: "3/17/2018"
 output:
   html_document:
-    smart: no
-    number_sections: true
-    fig_caption: true
-    toc: true
-    fig_width: 7
-    fig_height: 4.5
-    theme: cosmo
-    highlight: tango
     code_folding: hide
-  
+    fig_caption: yes
+    fig_height: 4.5
+    fig_width: 7
+    highlight: tango
+    number_sections: yes
+    smart: no
+    theme: cosmo
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -40,6 +39,9 @@ library(dplyr)
 library(ggplot2)
 library(corrplot)
 library(DT)
+library(GGally)
+library(tidyr)
+library(e1071)
 crowd_fund <- read.csv("recos_training.csv",
                   sep = ",", 
                   header = TRUE, 
@@ -75,19 +77,42 @@ which(apply(train,2,function(x) { all(x %in% 0:1) }))
 train$owner_friend <- as.factor(train$owner_friend)
 train$same_owner <- as.factor(train$same_owner)
 train$contrib <- as.factor((train$contrib))
+
 ```
 
 ## Exploring
 
-Let's see what type of a dataset we are dealing with:
+With prior knowledge that we are dealing with a sparce dataset, let's try and visualise how much of our data is actually zeros.
 
-
-g Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r, warning= FALSE}
+zero_values <- as.data.frame(colSums(train == 0))
+ggplot(zero_values,aes(x=reorder(rownames(zero_values),zero_values[,]),y=zero_values[,])) + 
+  geom_bar(stat="identity",fill="red")+theme_bw() + ylab("Count") + xlab("Features") + 
+  theme(axis.text.x=element_text(angle = -90, hjust = 0))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+More than 90% of our data are zeros. Extrating meaningful information form such datasets do prove to be quite the task. So let's start talking to the data. 
+
+### The Primary Attributes
+These attributes consists of all the features excluding the different project genres offered on the crowdfunding platfrom. To understand the interation between these features let's display a combination of scatter and correlation plot. 
+
+
+
+```{r , warning= FALSE, fig.height= 8, fig.width= 9}
+panel.cor <- function(x, y){
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- round(cor(x, y), digits=4)
+  txt <- paste0("R = ", r)
+  text(0.5, 0.5, txt)
+}
+my_cols <- c("red","blue")
+# Customize upper panel
+upper.panel<-function(x, y){
+  points(x,y, pch = 19, col = my_cols[train$contrib])
+}
+# Create the plots
+pairs(train[,c(1:8,24)], 
+      lower.panel = panel.cor,
+      upper.panel = upper.panel)
+```
