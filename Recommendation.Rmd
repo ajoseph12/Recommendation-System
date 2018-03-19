@@ -1,0 +1,93 @@
+---
+title: "Crowdfunding Platfrom - Recommendation Engine"
+author: "Allwyn Joseph - MLDM"
+date: "3/17/2018"
+output:
+  html_document:
+    smart: no
+    number_sections: true
+    fig_caption: true
+    toc: true
+    fig_width: 7
+    fig_height: 4.5
+    theme: cosmo
+    highlight: tango
+    code_folding: hide
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem Understanding
+
+As of today, recommendation systems stand as one of the biggest driving forces of the e-commerce industry. Its success began provoking these systems to be put in place within social media, online entertainment and a myriad other industries. One such space where recommendaion systems are beginning to burgeon are within crowdfunding platfromes.
+
+This report will focus on building a content based, robust and simple recommendation engine based on data sourced from a crowdfunding platfrom. The aim of the engine would be
+to try and set up a personalized recommendations engine for the users by means of trying and predicting the genré's of projects the users would be most inclined to contributing towards. 
+
+
+# Data Understanding
+
+This section would try and attain a holistic view of the dataset in three steps, Reading, Tweaking, and Exploring.  
+
+## Reading and Tweaking
+Loading the data set:
+```{r, message=FALSE, warning=FALSE, results='hide'}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+library(DT)
+crowd_fund <- read.csv("recos_training.csv",
+                  sep = ",", 
+                  header = TRUE, 
+                  na.strings = c("NA","#DIV/0!",""))
+train <- crowd_fund
+```
+
+
+```{r include=FALSE}
+options(tibble.width = Inf)
+```
+
+
+There are a total of 24 features per user. You can scroll the x-axis to see all of them. (The column discriptions for the dataset can be found in the Github repository.)
+
+```{r, result='asis', echo=FALSE}
+datatable(head(crowd_fund,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
+```
+
+One can observe from the table above that the dataset is being dealt with is numeric in nature. But, there are features within the dataset that are booleans. In the following step along with rectifying this, the 'id' column will be deleted as it serves no particular purpose. 
+```{r, result='asis', echo=TRUE, results='hide'}
+# nullifying 'id' column
+train$id <- NULL
+crowd_fund <- NULL
+
+# checking for NA values
+any(is.na(train))
+
+# converting 'numeric' boolean columns to factors
+## which columns are boolean 
+which(apply(train,2,function(x) { all(x %in% 0:1) }))
+## converting these to factors
+train$owner_friend <- as.factor(train$owner_friend)
+train$same_owner <- as.factor(train$same_owner)
+train$contrib <- as.factor((train$contrib))
+```
+
+## Exploring
+
+Let's see what type of a dataset we are dealing with:
+
+
+g Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
