@@ -4,6 +4,9 @@
 Within the project I try and put in place various models which, based on the features of a user,
 predicts as to where he or she will contribute to a recommended project. 
 
+To view this project in its html page please click the link below:
+http://rpubs.com/ajoseph/371399
+
 
 ### Data Description
 
@@ -13,7 +16,7 @@ to the target variable and the other one is the user_id which can be ignored.
 The 23 variables are as follows:
 
 * same_owner : a boolean which expresses the fact that the user has already supported a project 
-# headed by the same project leader as the recommended project.
+headed by the same project leader as the recommended project.
 * owner_friend : a boolean which expresses whether the head of the recommended project was one 
 the user had supported before.
 * nb_friends : an integer value expressing the number of Facebook friends of the user who 
