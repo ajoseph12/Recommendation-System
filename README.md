@@ -4,7 +4,7 @@
 Within the project I try and put in place various models which, based on the features of a user,
 predicts as to where he or she will contribute to a recommended project. 
 
-To view this project in its html page please click the link below:
+To view this project in its html page please click the link :
 http://rpubs.com/ajoseph/371399
 
 

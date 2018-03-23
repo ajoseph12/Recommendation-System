@@ -1,5 +1,5 @@
 ---
-title: "Crowdfunding Platfrom - Recommendation Engine"
+title: "Crowdfunding Platfrom - Modelling User Contribution"
 author: "Allwyn Joseph - MLDM"
 date: "3/17/2018"
 output:
@@ -19,6 +19,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+[Please click here to head to an interactive html page of the report](http://rpubs.com/ajoseph/371399)
 # Problem Understanding
 
 As of today, recommendation systems stand as one of the biggest driving forces of the e-commerce industry. Its success began provoking these systems to be put in place within social media, online entertainment and a myriad other industries. One such space where recommendaion systems are beginning to burgeon are within crowdfunding platfromes.
@@ -70,7 +71,7 @@ There are a total of 24 features per user. You can scroll the x-axis to see all 
 datatable(head(crowd_fund,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
 ```
 
-One can observe from the table above that the dataset is being dealt with is numeric in nature. But, there are features within the dataset that are booleans. In the following step along with rectifying this, the 'id' column will be deleted as it serves no particular purpose. 
+One can observe from the table above that the dataset being dealt with is numeric in nature. But, there are features within the dataset that are booleans. In the following step along with rectifying this. The 'id' column will be deleted as well since it serves no particular purpose. 
 ```{r, result='asis', echo=TRUE, results='hide'}
 
 # nullifying 'id' column
@@ -144,7 +145,7 @@ The secondary attributes mainly have to do with the project genres that are host
 corrplot(cor(crowd_fund[,9:24]), method = "color")
 ```
 
-Like with the primary features, the secondary ones too have very little correlation amongst themselves and the feature 'contrib. Again, a PCA transform might help better with data extraction.  
+Like with the primary features, the secondary ones too have very little correlation amongst themselves and the feature 'contrib'. Again, a PCA transform might help better with data extraction.  
 
 # Data Preparation, Modelling and Evaluation
 The dataset we are dealing with can be considered unbalanced, i.e when the class of interest (minority class) is much rarer than normal behaviour (majority class). In such datasets cost of missing a minority class is typically much higher that missing a majority class. Most learning systems are not prepared to cope with unbalanced data. So in this section we explore some of those techniques in combination with logistic regression, SVM and Random Forest classifiers and see what works best. 
@@ -188,7 +189,7 @@ my_test<- train[-inTrain, ]
 
 ## Simple and Weighted Logistic regression 
 
-In this section I try and validate the necessity of a PCA transform and model logistic regression to fit well this imbalanced dataset we are dealing with. The section entails training a normal and weighted logistic regression on the original and preprocessed dataset to try and observe its effect on modelling. 
+In this section I try and validate the necessity of a PCA transform and model logistic regression to fit well the imbalanced dataset we are dealing with. This section entails training a normal and weighted logistic regression on the original and preprocessed dataset to try and observe its effect on modelling. 
 
 $$weight = \frac{number\ of\ instances }{(number\ of\ classes * number\ of\ majoirty/minoirty\ class\ instances)}$$
 
@@ -258,8 +259,8 @@ kable(df_resutls, caption = "Accuracy, Sensitivity and Specificity for the Weigh
 
 ```
 
-
 From the table above table it becomes evident of the negligible role PCA plays with this dataset towards ameliorating  the models/classifer. Resutls show that with and without preprocessing the models' accuray, sensitivity and specificity remains the same. So in the following sections I will avoid the preprocessed data and instead only model on the original data.
+
 
 While logistic model in itself has a poor specificity score, the weighted version of the same performs quite well with a score nearing 0.6. While attaining a score of 0.6 the weighted logistic regresion doen't compromise too much on the accuracy and sensitivity scores. Next, I put to test a few other sampling techniques to even the weights out between the majorit and minority classes. 
 
@@ -267,9 +268,11 @@ While logistic model in itself has a poor specificity score, the weighted versio
 ## Logistic regression, SVM and Randomforest with Under and Oversampling
 In this section Logistic, SVM and Randomforest classifiers will be modeled on under and over sampled datasets and their performaces will be recored and tablulated. 
 
+### Undersampling 
+
 I began with undersampling the original data, this is primarily done by ignoring some points from the majority class while keeping intact the points from the minority class. Once the undersampled dataset is created Logistic, SVM and Randomforest classifiers are modeled upon it. 
 
-```{r , warning= FALSE, eval = TRUE, cache = FALSE}
+```{r , warning= FALSE, eval = TRUE, cache = TRUE}
 ### Undersampling with logistic regression, SVMs and Randomforest 
 
 #-------------------------------------------------------------------undersampled_logistic_svm_rf
@@ -317,9 +320,8 @@ kable(df_under, caption = "Accuracy, Sensitivity and Specificity for
 
 From the table above we see similar performace with regard to specificity for the logistic and SVM classifiers without having compromised too much the accuracy and sensitivity of the data. Off the three, the random forest classifier achieved the best specificity score, but this came at the price of lower accuracy and sensitivity score. 
 
-
-
-I then moved onto oversampling the original data, this is primarily done oversampling instances from the minority class while keeping intact the points from the majority class. Once the oversampled dataset is created Logistic, SVM and Randomforest classifiers are modeled upon it. 
+### Oversampling
+I then moved onto oversampling the original data, this is primarily done by oversampling instances from the minority class while keeping intact the points from the majority class. Once the oversampled dataset is created Logistic, SVM and Randomforest classifiers are modeled upon it. 
 ```{r , warning= FALSE, eval = TRUE, cache=TRUE}
 
 ### Oversampling with logistic regression, SVMs and Randomforest 
@@ -371,7 +373,7 @@ From the table above we see similar performace with regard to specificity for th
 ## Logistic regression, SVM and Randomforest with Hybrid sampling techniques 
 In this section Logistic, SVM and Randomforest classifiers will be modeled on Hybrid sampled  - datasets will undergo under and oversampling - datasets and their performaces will be recored and tablulated. 
 
-
+### SMOTE TOMEK Hybrid sampling
 I began with deploying a SMOTE TOMEK hybrid sampling teching over the original data. Oversampling using SMOTE followed by under sampling using Tomek. Once the hybrid dataset is created Logistic, SVM and Randomforest classifiers are modeled upon it. 
 
 
@@ -410,7 +412,7 @@ cm_st_log<- confusionMatrix(PredictedValue, my_test_num$contrib)
 # SVM
 svm_3 <- svm(contrib ~ ., data = data_tomsmot,kernel = "radial")
 svm_pred_3  <- predict(svm_3, my_test_num, type = "class")
-cm_st_svm<- confusionMatrix(svm_pred_3, my_test$contrib)
+cm_st_svm<- confusionMatrix(svm_pred_3, my_test_num$contrib)
 
 # Random Forest
 rf_3<- randomForest(contrib ~ ., data = data_tomsmot, importance = TRUE, ntree = 1000)
@@ -435,6 +437,7 @@ kable(df_st_hybrid, caption = "Accuracy, Sensitivity and Specificity for
 
 As seen in the table above, unfortunately, the SMOTE TOMEK hybrid sampling doesn't render high specificity scores. While the specificity score for logistic regression was low, the scores for SVM and random forest were worse off.
 
+### SMOTE ENN Hybrid sampling
 
 I then moved onto SMOTE ENN sampling of the original data. TOversampling using SMOTE followed by under sampling using ENN. Once the oversampled dataset is created Logistic, SVM and Randomforest classifiers are modeled upon it.
 
@@ -496,11 +499,11 @@ kable(df_se_hybrid, caption = "Accuracy, Sensitivity and Specificity for
 
 Concerning the results from the final modeling, we still see a rather poor performance from the classifiers with regard to specificity. Once again, while the specificity score for logistic regression was low, the scores for SVM and random forest were worse off.
 
-# Deploymet 
+# Deployment 
 
 Off the classifiers and sampling methods tested one could safely attest to the fact that, on a whole the classifiers performed best with undersampled data. While this is true, good performance was seen by weighted logitic regression too. So let's put all of these models to a final test. 
 
-```{r , warning= FALSE, eval = TRUE, cache= FALSE}
+```{r , warning= FALSE, eval = TRUE}
 
 # Logistic Regression weighted
 pred_logr_2<- predict(logreg_2, crowd_fund_test,type = "response")
@@ -542,4 +545,7 @@ kable(df_final, caption = "Accuracy, Sensitivity and Specificity for the final s
       choosen models ")
 
 ```
+
+From the final simulation it is observed that the random forest model performed best. But on must keep in mind that the random forest model is complex and computationally  intensive. With some fine tuning and feature engineering simpler models such has logistic regression can be set to work quite well for classifcation problems on imbalanced datasets. This is imperative as datasets get bigger and bigger, the longer ensemble models take to fit. 
+At the end of the day, it boils down to how much computational power one has at his or her disposal and what levels of accuracy/specificity is expected.
 

@@ -91,7 +91,7 @@ summary(train)
 "seems like owner friend wouldn't be of much use, given a single positive instance, 
 let's give that instance a look though, just to be sure."
 train[train$owner_friend == 1,]
-"Hahaha, seems like user 318 had contributed only because he was a friend of the owner. 
+"Seems like user 318 had contributed only because he was a friend of the owner. 
 Or more like the user had created an account on kisskissbankbank for the sole purpose of supporting
 his friend."
 0
@@ -651,6 +651,22 @@ PredictedValue =  ifelse(pred_logr_2 > 0.5,1,0)
 confusionMatrix(PredictedValue, my_test$contrib)
 "You could run a loop to find best weight cross validate"
   
+
+temp <- data<-ubUnder(X=my_train[,-24], Y= my_train$contrib, perc = 50, method = "percPos")
+data_under<-cbind(temp$X, temp$Y)
+colnames(data_under)[24]<- "contrib"
+
+## Modeling
+
+#Logistic Regression
+logreg_3<- glm(contrib~., data = data_under, family  = "binomial")
+PredictedValue =  ifelse(pred_logr_3 > 0.5,1,0)
+confusionMatrix(PredictedValue, crowd_fund_test$contrib)
+
+
+
+
+
 
 
 
