@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 [Please click here to head to an interactive html page of the report](http://rpubs.com/ajoseph/371399)
+
 # Problem Understanding
 
 As of today, recommendation systems stand as one of the biggest driving forces of the e-commerce industry. Its success began provoking these systems to be put in place within social media, online entertainment and a myriad other industries. One such space where recommendaion systems are beginning to burgeon are within crowdfunding platfromes.
